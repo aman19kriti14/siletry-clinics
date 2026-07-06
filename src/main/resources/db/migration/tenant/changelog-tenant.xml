@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+	<changeSet id="t001-create-doctor" author="siletry">
+		<createTable tableName="doctor">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="specialization" type="VARCHAR(255)" />
+			<column name="slot_duration_minutes" type="INT"
+				defaultValueNumeric="15">
+				<constraints nullable="false" />
+			</column>
+			<column name="working_hours_json" type="TEXT" />
+			<column name="active" type="BOOLEAN"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="t002-create-patient" author="siletry">
+		<createTable tableName="patient">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="phone" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="email" type="VARCHAR(255)" />
+			<column name="dob" type="DATE" />
+			<column name="age" type="INT" />
+			<column name="gender" type="VARCHAR(20)" />
+			<column name="channel_preference" type="VARCHAR(20)"
+				defaultValue="UNSET">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_via" type="VARCHAR(20)" />
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createIndex indexName="idx_patient_phone"
+			tableName="patient">
+			<column name="phone" />
+		</createIndex>
+	</changeSet>
+
+	<changeSet id="t003-create-appointment" author="siletry">
+		<createTable tableName="appointment">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="VARCHAR(36)">
+				<constraints nullable="false"
+					foreignKeyName="fk_appointment_patient" references="patient(id)" />
+			</column>
+			<column name="doctor_id" type="VARCHAR(36)">
+				<constraints nullable="false"
+					foreignKeyName="fk_appointment_doctor" references="doctor(id)" />
+			</column>
+			<column name="scheduled_at" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="appointment_type" type="VARCHAR(20)" />
+			<column name="status" type="VARCHAR(20)" defaultValue="BOOKED">
+				<constraints nullable="false" />
+			</column>
+			<column name="booking_source" type="VARCHAR(20)" />
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createIndex indexName="idx_appointment_scheduled_at"
+			tableName="appointment">
+			<column name="scheduled_at" />
+		</createIndex>
+		<createIndex indexName="idx_appointment_doctor_scheduled"
+			tableName="appointment">
+			<column name="doctor_id" />
+			<column name="scheduled_at" />
+		</createIndex>
+	</changeSet>
+
+	<changeSet id="t004-create-notification" author="siletry">
+		<createTable tableName="notification">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="VARCHAR(36)">
+				<constraints nullable="false"
+					foreignKeyName="fk_notification_patient" references="patient(id)" />
+			</column>
+			<column name="appointment_id" type="VARCHAR(36)">
+				<constraints
+					foreignKeyName="fk_notification_appointment"
+					references="appointment(id)" />
+			</column>
+			<column name="intent" type="VARCHAR(30)">
+				<constraints nullable="false" />
+			</column>
+			<column name="scheduled_for" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="status" type="VARCHAR(20)"
+				defaultValue="PENDING">
+				<constraints nullable="false" />
+			</column>
+			<column name="channel_used" type="VARCHAR(20)" />
+			<column name="payload" type="TEXT" />
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="sent_at" type="TIMESTAMP" />
+		</createTable>
+		<!-- de-dupe fix from earlier: one reminder of a given intent per appointment -->
+		<addUniqueConstraint tableName="notification"
+			columnNames="appointment_id, intent"
+			constraintName="uq_notification_appointment_intent" />
+		<createIndex indexName="idx_notification_status_scheduled"
+			tableName="notification">
+			<column name="status" />
+			<column name="scheduled_for" />
+		</createIndex>
+	</changeSet>
+
+	<changeSet id="t005-create-staff-user" author="siletry">
+		<createTable tableName="staff_user">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="email" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true" />
+			</column>
+			<column name="password_hash" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="role" type="VARCHAR(20)" defaultValue="STAFF">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+
+</databaseChangeLog>
