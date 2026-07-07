@@ -52,7 +52,17 @@ public class TenantProvisioningService {
 			try (Liquibase liquibase = new Liquibase(TENANT_CHANGELOG, new ClassLoaderResourceAccessor(), database)) {
 				liquibase.update("");
 			}
+			// connection is now closed by Liquibase - do NOT reuse it below
 
+		} catch (Exception e) {
+			log.error("Failed to run schema migration for tenant: {}", schemaName, e);
+			throw new IllegalStateException("Failed to provision tenant schema: " + schemaName, e);
+		}
+
+		// Fresh connection for the owner seed insert, since Liquibase closed the
+		// previous one
+		try (Connection connection = dataSource.getConnection()) {
+			connection.setSchema(schemaName);
 			try (var stmt = connection
 					.prepareStatement("INSERT INTO staff_user (id, email, password_hash, name, role, created_at) "
 							+ "VALUES (?, ?, ?, ?, 'OWNER', now())")) {
@@ -62,9 +72,8 @@ public class TenantProvisioningService {
 				stmt.setString(4, ownerName);
 				stmt.executeUpdate();
 			}
-
 		} catch (Exception e) {
-			log.error("Failed to provision tenant schema: {}", schemaName, e);
+			log.error("Failed to seed owner account for tenant: {}", schemaName, e);
 			throw new IllegalStateException("Failed to provision tenant schema: " + schemaName, e);
 		}
 
