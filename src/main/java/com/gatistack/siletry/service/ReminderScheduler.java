@@ -28,21 +28,17 @@ public class ReminderScheduler {
 	private final RecallService recallService;
 
 	public ReminderScheduler(TenantRepository tenantRepository, AppointmentRepository appointmentRepository,
-			NotificationService notificationService) {
+			NotificationService notificationService, NotificationRepository notificationRepository,
+			RecallService recallService) {
 		this.tenantRepository = tenantRepository;
 		this.appointmentRepository = appointmentRepository;
 		this.notificationService = notificationService;
-		this.notificationRepository = null;
-		this.recallService = null;
+		this.notificationRepository = notificationRepository;
+		this.recallService = recallService;
 	}
 
-	// Runs every 15 min: sweeps all active tenants, schedules reminders that just
-	// entered the 24h/2h window, and dispatches anything already due.
 	@Scheduled(fixedRate = 15 * 60 * 1000)
 	public void run() {
-		// This query itself must hit the master schema, not a tenant schema -
-		// TenantContext is cleared here, so TenantIdentifierResolver falls back to
-		// "master" (see #2).
 		List<Tenant> activeTenants = tenantRepository.findAll().stream()
 				.filter(t -> t.getStatus() == Tenant.TenantStatus.ACTIVE || t.getStatus() == Tenant.TenantStatus.TRIAL)
 				.toList();
@@ -52,7 +48,6 @@ public class ReminderScheduler {
 				TenantContext.setSchema(tenant.getSchemaName());
 				processTenant();
 			} catch (Exception e) {
-				// One clinic's failure must never block the others in the sweep
 				log.error("Reminder sweep failed for tenant {}: {}", tenant.getSchemaName(), e.getMessage(), e);
 			} finally {
 				TenantContext.clear();
@@ -69,12 +64,9 @@ public class ReminderScheduler {
 	private void scheduleUpcomingReminders() {
 		LocalDateTime now = LocalDateTime.now();
 
-		// 24h window: appointments between 23h45m and 24h from now that haven't been
-		// scheduled yet
 		scheduleForWindow(now.plusHours(24).minusMinutes(15), now.plusHours(24),
 				NotificationRecord.NotificationIntent.APPOINTMENT_REMINDER_24H);
 
-		// 2h window
 		scheduleForWindow(now.plusHours(2).minusMinutes(15), now.plusHours(2),
 				NotificationRecord.NotificationIntent.APPOINTMENT_REMINDER_2H);
 	}
