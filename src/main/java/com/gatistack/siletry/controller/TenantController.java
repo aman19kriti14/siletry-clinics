@@ -1,5 +1,7 @@
 package com.gatistack.siletry.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,8 @@ import jakarta.validation.constraints.NotBlank;
 @RestController
 @RequestMapping("/api/tenants")
 public class TenantController {
+	
+	Logger log = LoggerFactory.getLogger("");
 
 	private final TenantProvisioningService provisioningService;
 
@@ -41,6 +45,7 @@ public class TenantController {
 
 	@GetMapping("/api/ping")
 	public String ping() {
-		return "pong";
+	    log.info("PING ENDPOINT HIT");
+	    return "pong";
 	}
 }
