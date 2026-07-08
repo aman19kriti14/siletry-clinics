@@ -28,7 +28,8 @@ public class LoginRateLimitFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		if (request.getRequestURI().equals("/api/auth/login") && request.getMethod().equals("POST")) {
+		 if ((request.getRequestURI().equals("/api/auth/login") || request.getRequestURI().equals("/api/tenants/signup"))
+		        && request.getMethod().equals("POST")) { {
 			String ip = request.getRemoteAddr();
 			Window window = attempts.computeIfAbsent(ip, k -> new Window());
 
@@ -47,4 +48,5 @@ public class LoginRateLimitFilter extends OncePerRequestFilter {
 		}
 		filterChain.doFilter(request, response);
 	}
+}
 }

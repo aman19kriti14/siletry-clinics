@@ -126,10 +126,12 @@ public class WhatsAppWebhookController {
 
 	private Patient createNewPatient(String phone) {
 		Patient patient = new Patient();
-		patient.setName("Unknown"); // AI can ask for their name in conversation, or staff updates it later
+		patient.setName("Unknown");
 		patient.setPhone(phone);
 		patient.setCreatedVia(Patient.CreatedVia.WHATSAPP_INBOUND);
-		patient.setPreferredLanguage("en"); // default - could be improved with language detection later
+		patient.setPreferredLanguage("en");
+		patient.setChannelPreference(Patient.ChannelPreference.WHATSAPP); // fix: they reached out via WhatsApp, so
+																			// that's their channel
 		return patientRepository.save(patient);
 	}
 }

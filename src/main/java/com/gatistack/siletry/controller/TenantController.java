@@ -30,4 +30,11 @@ public class TenantController {
 		return provisioningService.provision(request.clinicName(), request.schemaName(), request.address(),
 				request.phone(), request.email(), request.ownerEmail(), request.ownerPassword(), request.ownerName());
 	}
+
+	// New public signup endpoint - no admin secret required
+	@PostMapping("/signup")
+	public Tenant signup(@RequestBody ProvisionRequest request) {
+		return provisioningService.provision(request.clinicName(), request.schemaName(), request.address(),
+				request.phone(), request.email(), request.ownerEmail(), request.ownerPassword(), request.ownerName());
+	}
 }
