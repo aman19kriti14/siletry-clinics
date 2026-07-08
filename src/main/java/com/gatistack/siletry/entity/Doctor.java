@@ -28,5 +28,9 @@ public class Doctor {
 	@Column(columnDefinition = "TEXT")
 	private String workingHoursJson;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "location_id")
+	private Location location; // nullable for backward compatibility with pre-multi-location clinicsStaffUser
+
 	private boolean active = true;
 }

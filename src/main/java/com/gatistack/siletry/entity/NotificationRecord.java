@@ -43,7 +43,7 @@ public class NotificationRecord {
 	private LocalDateTime sentAt;
 
 	public enum NotificationIntent {
-		APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_2H, POST_VISIT_FOLLOWUP
+		APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_2H, POST_VISIT_FOLLOWUP, RECALL
 	}
 
 	public enum NotificationStatus {

@@ -44,7 +44,18 @@ public class Patient {
 	@Enumerated(EnumType.STRING)
 	private CreatedVia createdVia;
 
+	@Column(nullable = false)
+	private String preferredLanguage = "en"; // ISO code: "en", "hi", "ml", etc.
+
 	private LocalDateTime createdAt = LocalDateTime.now();
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private ConversationMode conversationMode = ConversationMode.AI;
+
+	public enum ConversationMode {
+		AI, STAFF
+	}
 
 	public enum Gender {
 		MALE, FEMALE, OTHER, UNDISCLOSED

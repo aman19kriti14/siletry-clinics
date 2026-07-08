@@ -18,7 +18,7 @@ public class PatientService {
 
 	// Quick-add flow for walk-ins/phone bookings - matches existing patient by
 	// phone first
-	public Patient findOrCreate(String name, String phone, Patient.CreatedVia createdVia) {
+	public Patient findOrCreate(String name, String phone, Patient.CreatedVia createdVia, String preferredLanguage) {
 		Optional<Patient> existing = patientRepository.findByPhone(phone);
 		if (existing.isPresent()) {
 			return existing.get();
@@ -27,6 +27,7 @@ public class PatientService {
 		patient.setName(name);
 		patient.setPhone(phone);
 		patient.setCreatedVia(createdVia);
+		patient.setPreferredLanguage(preferredLanguage != null ? preferredLanguage : "en");
 		return patientRepository.save(patient);
 	}
 

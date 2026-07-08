@@ -24,8 +24,14 @@ public class StaffUser {
 	@Column(nullable = false)
 	private String name;
 
+	private String phone;
+
 	@Enumerated(EnumType.STRING)
 	private Role role = Role.STAFF;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "location_id")
+	private Location location; // null = access to all locations (typically OWNER)
 
 	private LocalDateTime createdAt = LocalDateTime.now();
 

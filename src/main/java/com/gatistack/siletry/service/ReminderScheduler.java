@@ -25,6 +25,7 @@ public class ReminderScheduler {
 	private final AppointmentRepository appointmentRepository;
 	private final NotificationService notificationService;
 	private final NotificationRepository notificationRepository;
+	private final RecallService recallService;
 
 	public ReminderScheduler(TenantRepository tenantRepository, AppointmentRepository appointmentRepository,
 			NotificationService notificationService) {
@@ -32,6 +33,7 @@ public class ReminderScheduler {
 		this.appointmentRepository = appointmentRepository;
 		this.notificationService = notificationService;
 		this.notificationRepository = null;
+		this.recallService = null;
 	}
 
 	// Runs every 15 min: sweeps all active tenants, schedules reminders that just
@@ -61,6 +63,7 @@ public class ReminderScheduler {
 	private void processTenant() {
 		scheduleUpcomingReminders();
 		notificationService.dispatchDueNotifications();
+		recallService.processRecalls();
 	}
 
 	private void scheduleUpcomingReminders() {

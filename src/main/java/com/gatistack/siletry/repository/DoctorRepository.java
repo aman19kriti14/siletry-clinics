@@ -6,5 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<Doctor, String> {
-    List<Doctor> findByActiveTrue();
+	List<Doctor> findByActiveTrue();
+
+	// Add to DoctorRepository.java
+	List<Doctor> findByLocationIdAndActiveTrue(String locationId);
 }

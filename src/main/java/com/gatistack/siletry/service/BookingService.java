@@ -88,4 +88,20 @@ public class BookingService {
 		}
 		return available;
 	}
+
+	public Appointment reschedule(String appointmentId, LocalDateTime newDateTime) {
+		Appointment appointment = appointmentRepository.findById(appointmentId)
+				.orElseThrow(() -> new IllegalArgumentException("Appointment not found: " + appointmentId));
+
+		if (appointment.getStatus() == Appointment.AppointmentStatus.COMPLETED
+				|| appointment.getStatus() == Appointment.AppointmentStatus.CANCELLED) {
+			throw new IllegalStateException("Cannot reschedule a " + appointment.getStatus() + " appointment");
+		}
+
+		checkConflict(appointment.getDoctor().getId(), newDateTime, appointment.getDoctor().getSlotDurationMinutes());
+
+		appointment.setScheduledAt(newDateTime);
+		appointment.setStatus(Appointment.AppointmentStatus.BOOKED); // reset in case it was CONFIRMED
+		return appointmentRepository.save(appointment);
+	}
 }

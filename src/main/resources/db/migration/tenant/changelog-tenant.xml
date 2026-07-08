@@ -161,4 +161,220 @@
 		</createTable>
 	</changeSet>
 
+	<changeSet id="t006-create-recall-rule" author="siletry">
+		<createTable tableName="recall_rule">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="appointment_type" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="interval_days" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="active" type="BOOLEAN"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+			<column name="message_template" type="TEXT" />
+		</createTable>
+	</changeSet>
+
+	<changeSet id="t007-create-feedback" author="siletry">
+		<createTable tableName="feedback">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="VARCHAR(36)">
+				<constraints nullable="false"
+					foreignKeyName="fk_feedback_patient" references="patient(id)" />
+			</column>
+			<column name="appointment_id" type="VARCHAR(36)">
+				<constraints foreignKeyName="fk_feedback_appointment"
+					references="appointment(id)" />
+			</column>
+			<column name="rating" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="comment" type="TEXT" />
+			<column name="sentiment" type="VARCHAR(20)" />
+			<column name="escalated" type="BOOLEAN"
+				defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createIndex indexName="idx_feedback_escalated"
+			tableName="feedback">
+			<column name="escalated" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="t008-create-follow-up-response"
+		author="siletry">
+		<createTable tableName="follow_up_response">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="VARCHAR(36)">
+				<constraints nullable="false"
+					foreignKeyName="fk_followup_patient" references="patient(id)" />
+			</column>
+			<column name="notification_id" type="VARCHAR(36)">
+				<constraints foreignKeyName="fk_followup_notification"
+					references="notification(id)" />
+			</column>
+			<column name="reply_text" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+			<column name="assessment" type="VARCHAR(20)" />
+			<column name="ai_reasoning" type="TEXT" />
+			<column name="escalated" type="BOOLEAN"
+				defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet id="t009-create-queue-entry" author="siletry">
+		<createTable tableName="queue_entry">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="appointment_id" type="VARCHAR(36)">
+				<constraints nullable="false" unique="true"
+					foreignKeyName="fk_queue_appointment" references="appointment(id)" />
+			</column>
+			<column name="token_number" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="status" type="VARCHAR(20)"
+				defaultValue="WAITING">
+				<constraints nullable="false" />
+			</column>
+			<column name="checked_in_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="called_at" type="TIMESTAMP" />
+			<column name="completed_at" type="TIMESTAMP" />
+		</createTable>
+		<createIndex indexName="idx_queue_status"
+			tableName="queue_entry">
+			<column name="status" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="t010-create-location" author="siletry">
+		<createTable tableName="location">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="address" type="TEXT" />
+			<column name="phone" type="VARCHAR(20)" />
+			<column name="active" type="BOOLEAN"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="t011-add-location-to-doctor" author="siletry">
+		<addColumn tableName="doctor">
+			<column name="location_id" type="VARCHAR(36)">
+				<constraints foreignKeyName="fk_doctor_location"
+					references="location(id)" />
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="t012-add-location-to-staff-user"
+		author="siletry">
+		<addColumn tableName="staff_user">
+			<!-- nullable: OWNER role sees all locations; STAFF can be scoped to one -->
+			<column name="location_id" type="VARCHAR(36)">
+				<constraints foreignKeyName="fk_staffuser_location"
+					references="location(id)" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet id="t013-create-conversation-message"
+		author="siletry">
+		<createTable tableName="conversation_message">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="VARCHAR(36)">
+				<constraints nullable="false"
+					foreignKeyName="fk_conversation_patient" references="patient(id)" />
+			</column>
+			<column name="direction" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="content" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+			<column name="action_taken" type="TEXT" />
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createIndex indexName="idx_conversation_patient_created"
+			tableName="conversation_message">
+			<column name="patient_id" />
+			<column name="created_at" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="t014-add-conversation-mode-to-patient"
+		author="siletry">
+		<addColumn tableName="patient">
+			<column name="conversation_mode" type="VARCHAR(20)"
+				defaultValue="AI">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="t015-create-escalation" author="siletry">
+		<createTable tableName="escalation">
+			<column name="id" type="VARCHAR(36)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="VARCHAR(36)">
+				<constraints nullable="false"
+					foreignKeyName="fk_escalation_patient" references="patient(id)" />
+			</column>
+			<column name="reason" type="VARCHAR(30)">
+				<constraints nullable="false" />
+			</column>
+			<column name="detail" type="TEXT" />
+			<column name="resolved" type="BOOLEAN"
+				defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_at" type="TIMESTAMP"
+				defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="resolved_at" type="TIMESTAMP" />
+		</createTable>
+		<createIndex indexName="idx_escalation_resolved"
+			tableName="escalation">
+			<column name="resolved" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="t016-add-phone-to-staff-user" author="siletry">
+		<addColumn tableName="staff_user">
+			<column name="phone" type="VARCHAR(20)" />
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>
