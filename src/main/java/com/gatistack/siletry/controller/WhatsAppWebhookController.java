@@ -42,6 +42,9 @@ public class WhatsAppWebhookController {
 	public ResponseEntity<String> verify(@RequestParam("hub.mode") String mode,
 			@RequestParam("hub.verify_token") String token, @RequestParam("hub.challenge") String challenge) {
 
+		log.info("Webhook verify called: mode={}, token={}, challenge={}, expectedToken={}", mode, token, challenge,
+				verifyToken);
+
 		if ("subscribe".equals(mode) && verifyToken.equals(token)) {
 			return ResponseEntity.ok(challenge);
 		}
