@@ -38,17 +38,24 @@ public class WhatsAppWebhookController {
 
 	// Meta calls this once, when you configure the webhook URL in the dashboard,
 	// to confirm you actually control this endpoint.
+//	@GetMapping
+//	public ResponseEntity<String> verify(@RequestParam("hub.mode") String mode,
+//			@RequestParam("hub.verify_token") String token, @RequestParam("hub.challenge") String challenge) {
+//
+//		log.info("Webhook verify called: mode={}, token={}, challenge={}, expectedToken={}", mode, token, challenge,
+//				verifyToken);
+//
+//		if ("subscribe".equals(mode) && verifyToken.equals(token)) {
+//			return ResponseEntity.ok(challenge);
+//		}
+//		return ResponseEntity.status(403).body("Verification failed");
+//	}
+
 	@GetMapping
 	public ResponseEntity<String> verify(@RequestParam("hub.mode") String mode,
 			@RequestParam("hub.verify_token") String token, @RequestParam("hub.challenge") String challenge) {
 
-		log.info("Webhook verify called: mode={}, token={}, challenge={}, expectedToken={}", mode, token, challenge,
-				verifyToken);
-
-		if ("subscribe".equals(mode) && verifyToken.equals(token)) {
-			return ResponseEntity.ok(challenge);
-		}
-		return ResponseEntity.status(403).body("Verification failed");
+		return ResponseEntity.ok("HELLO-WEBHOOK");
 	}
 
 	// Meta calls this for every inbound event (messages, delivery receipts, etc.)
