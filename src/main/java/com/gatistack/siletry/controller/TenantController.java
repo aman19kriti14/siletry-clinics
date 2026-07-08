@@ -1,5 +1,6 @@
 package com.gatistack.siletry.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +37,10 @@ public class TenantController {
 	public Tenant signup(@RequestBody ProvisionRequest request) {
 		return provisioningService.provision(request.clinicName(), request.schemaName(), request.address(),
 				request.phone(), request.email(), request.ownerEmail(), request.ownerPassword(), request.ownerName());
+	}
+
+	@GetMapping("/api/ping")
+	public String ping() {
+		return "pong";
 	}
 }
