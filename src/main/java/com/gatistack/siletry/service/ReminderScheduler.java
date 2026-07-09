@@ -37,7 +37,7 @@ public class ReminderScheduler {
 		this.recallService = recallService;
 	}
 
-	@Scheduled(fixedRate = 15 * 60 * 1000)
+	//@Scheduled(fixedRate = 15 * 60 * 1000)
 	public void run() {
 		List<Tenant> activeTenants = tenantRepository.findAll().stream()
 				.filter(t -> t.getStatus() == Tenant.TenantStatus.ACTIVE || t.getStatus() == Tenant.TenantStatus.TRIAL)
