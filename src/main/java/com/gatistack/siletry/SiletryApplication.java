@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SiletryApplication {
 
 	public static void main(String[] args) {
+		System.out.println("########## BUILD JULY 9 20:30 ##########");
 		SpringApplication.run(SiletryApplication.class, args);
 	}
 
