@@ -19,6 +19,11 @@ public class SecurityConfig {
 		return http.build();
 	}
 
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
 //	private final JwtAuthFilter jwtAuthFilter;
 //	private final AdminEndpointFilter adminEndpointFilter;
 //	private final LoginRateLimitFilter loginRateLimitFilter;
